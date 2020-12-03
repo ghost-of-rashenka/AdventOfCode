@@ -19,5 +19,5 @@ def load_inputs_for_source(source_file):
     input_path = '/'.join((base, 'input', input_file))
 
     with open(input_path, 'r') as f:
-        return [line.split() for line in f.readlines()]
+        return [line.strip() for line in f.readlines()]
 
