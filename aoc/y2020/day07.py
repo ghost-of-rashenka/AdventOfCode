@@ -59,21 +59,19 @@ def part1():
 
 
 def rollup(start, rules):
-    print(start)
-    contains = rules[start]
-    if not contains:
-        print('non ->', [contains[c] * rollup(c, rules) for c in contains])
-        return 1
-    else:
-        print('rec ->', [contains[c] * rollup(c, rules) for c in contains])
-        return 1 + sum([contains[c] * rollup(c, rules) for c in contains])
+    contents = rules[start]
+    count = 0
+    if contents:
+        for bags in contents:
+            # Multiplier * the number of bags including this bag.
+            count += contents[bags] * (1 + rollup(bags, rules))
+    return count
 
 
 @timeit
 def part2():
-    rules = organize_rules(sample)
+    rules = organize_rules(INPUTS)
     print('answer:', rollup('shiny gold', rules))
-
 
 
 if __name__ == '__main__':
