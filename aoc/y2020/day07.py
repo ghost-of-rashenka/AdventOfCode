@@ -45,6 +45,7 @@ def found_gold(start_bag, rules):
             if found_gold(other_bag, rules):
                 return True
 
+
 @timeit
 def part1():
     rules = organize_rules(INPUTS)
@@ -57,9 +58,21 @@ def part1():
     # 300
 
 
+def rollup(start, rules):
+    print(start)
+    contains = rules[start]
+    if not contains:
+        print('non ->', [contains[c] * rollup(c, rules) for c in contains])
+        return 1
+    else:
+        print('rec ->', [contains[c] * rollup(c, rules) for c in contains])
+        return 1 + sum([contains[c] * rollup(c, rules) for c in contains])
+
+
 @timeit
 def part2():
-    pass
+    rules = organize_rules(sample)
+    print('answer:', rollup('shiny gold', rules))
 
 
 
