@@ -1,4 +1,5 @@
 from aoc.util import load_inputs_for_source, timeit
+import copy
 
 INPUTS = load_inputs_for_source(__file__)
 
@@ -28,9 +29,13 @@ def transform(lines):
 class Handheld:
 
     def __init__(self, instructions):
-        self.instructions = instructions
-        self.potential = self.instructions.copy()
-        self.flip = 0
+        """
+        :param instructions:
+        :type instructions: list
+        """
+        self.instructions = copy.deepcopy(instructions)
+        self.potential = copy.deepcopy(instructions)
+        self.flipper = 0
         self.counter = 0
         self.accumulator = 0
         self.exit = len(instructions)
@@ -56,30 +61,35 @@ class Handheld:
         return visited
 
     def run(self):
-        print(self.instructions)
         stop = self.do(self.instructions[0])
         while not stop:
             instruction = self.instructions[self.counter]
-            print(instruction)
             stop = self.do(instruction)
-        print(self.accumulator)
-        self.reset()
 
     def run2(self):
-        pass
+        while self.counter != self.exit:
+            instruction = self.potential[self.counter]
+            stop = self.do(instruction)
+            if stop:
+                self.flip_next()
+                self.reset()
+                continue
 
     def flip_next(self):
-        self.potential = self.instructions.copy()
-        self.flip += 1
-        while True:
-            instruction = self.potential[self.flip][1]
-            if instruction == 'nop':
-                self.potential[self.flip][1] = 'jmp'
-                break
-            elif instruction == 'jmp':
-                self.potential[self.flip][1] = 'nop'
-                break
-            self.flip += 1
+        self.potential = copy.deepcopy(self.instructions)
+        new_op = None
+        while not new_op and self.flipper < len(self.potential):
+            visited, operation, arg = self.potential[self.flipper]
+            if operation == 'nop':
+                new_op = 'jmp'
+            elif operation == 'jmp':
+                new_op = 'nop'
+            if new_op:
+                self.potential[self.flipper] = [visited, new_op, arg]
+                self.flipper += 1
+                return
+            else:
+                self.flipper += 1
 
     def reset(self):
         self.counter = 0
@@ -88,23 +98,22 @@ class Handheld:
 
 @timeit
 def part1():
-    instructions = transform(sample)
+    instructions = transform(INPUTS)
 
     game = Handheld(instructions)
     game.run()
+    print(game.accumulator)
+    # 1671
 
 
 @timeit
 def part2():
-    instructions = transform(sample)
+    instructions = transform(INPUTS)
+    
     game = Handheld(instructions)
-    print(game.potential)
-    game.flip_next()
-    print(game.potential)
-    game.flip_next()
-    print(game.potential)
-    game.flip_next()
-    print(game.potential)
+    game.run2()
+    print(game.accumulator)
+    # 892
 
 
 if __name__ == '__main__':
