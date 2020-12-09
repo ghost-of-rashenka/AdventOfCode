@@ -5,6 +5,7 @@ from time import perf_counter
 def timeit(func):
     """Print the time of the function call when it returns."""
     def time_wrap(*args, **kwargs):
+        print('{name}() go!'.format(name=func.__name__))
         start = perf_counter()
         returned = func(*args, **kwargs)
         print('{name}() took {elapsed:.3f} seconds.'.format(name=func.__name__,
