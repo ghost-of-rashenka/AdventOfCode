@@ -95,6 +95,7 @@ def part2():
     x = XmasParser(25, integers)
     weakness = x.crack()
     print(weakness)
+    # 4830226
 
 
 if __name__ == '__main__':
