@@ -59,22 +59,42 @@ class XmasParser:
                 return True
         return False
 
-    def process(self):
+    def find_invalid(self):
         while self.is_valid(self.next):
             self.move()
         return self.next
+
+    def crack(self):
+        invalid = self.find_invalid()
+        contiguous = []
+        start = 0
+        i = 0
+        while True:
+            contiguous.append(self.numbers[start + i])
+            if sum(contiguous) == invalid:
+                break
+            elif sum(contiguous) > invalid:
+                start += 1
+                i = 0
+                contiguous = []
+            else:
+                i += 1
+
+        return max(contiguous) + min(contiguous)
 
 
 @timeit
 def part1():
     x = XmasParser(25, integers)
-    print(x.process())
+    print(x.find_invalid())
     # 36845998
 
 
 @timeit
 def part2():
-    pass
+    x = XmasParser(25, integers)
+    weakness = x.crack()
+    print(weakness)
 
 
 if __name__ == '__main__':
