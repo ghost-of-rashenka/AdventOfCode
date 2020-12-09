@@ -29,11 +29,7 @@ def transform(lines):
 class Handheld:
 
     def __init__(self, instructions):
-        """
-        :param instructions:
-        :type instructions: list
-        """
-        self.instructions = copy.deepcopy(instructions)
+        self.instructions = instructions
         self.potential = copy.deepcopy(instructions)
         self.flipper = 0
         self.counter = 0
@@ -60,13 +56,13 @@ class Handheld:
 
         return visited
 
-    def run(self):
+    def run_repeat(self):
         stop = self.do(self.instructions[0])
         while not stop:
             instruction = self.instructions[self.counter]
             stop = self.do(instruction)
 
-    def run2(self):
+    def run_exit(self):
         while self.counter != self.exit:
             instruction = self.potential[self.counter]
             stop = self.do(instruction)
@@ -78,14 +74,14 @@ class Handheld:
     def flip_next(self):
         self.potential = copy.deepcopy(self.instructions)
         new_op = None
-        while not new_op and self.flipper < len(self.potential):
+        while not new_op:
             visited, operation, arg = self.potential[self.flipper]
             if operation == 'nop':
                 new_op = 'jmp'
             elif operation == 'jmp':
                 new_op = 'nop'
             if new_op:
-                self.potential[self.flipper] = [visited, new_op, arg]
+                self.potential[self.flipper][1] = new_op
                 self.flipper += 1
                 return
             else:
@@ -101,7 +97,7 @@ def part1():
     instructions = transform(INPUTS)
 
     game = Handheld(instructions)
-    game.run()
+    game.run_repeat()
     print(game.accumulator)
     # 1671
 
@@ -109,9 +105,9 @@ def part1():
 @timeit
 def part2():
     instructions = transform(INPUTS)
-    
+
     game = Handheld(instructions)
-    game.run2()
+    game.run_exit()
     print(game.accumulator)
     # 892
 
