@@ -1,4 +1,7 @@
+import copy
 from aoc.util import load_inputs_for_source, timeit
+from queue import Queue
+from concurrent.futures import ThreadPoolExecutor
 
 INPUTS = load_inputs_for_source(__file__)
 
@@ -55,29 +58,27 @@ sample2 = [
 ]
 
 
-def chain_up(available_adapters, start_jolts=0):
-    adapters = set(available_adapters.copy())
-    chain = []
-    input_jolts = start_jolts
+def chain_up(available_adapters, chain):
+    adapters = set(available_adapters)
+    input_jolts = chain[-1]
     while adapters:
         for jump in range(1, 4):
             adapter = input_jolts + jump
             if adapter in adapters:
                 adapters.remove(adapter)
-                chain.append({'adapter': adapter, 'jump': jump})
-                input_jolts = adapter
-                break
+                chain.append(adapter)
+                return chain_up(adapters, chain)
     return chain
 
 
 def count_joltage_differences(chain):
     jumps = {}
-    for adapter in chain:
-        jump = adapter['jump']
-        if jump not in jumps:
-            jumps.update({jump: 1})
-        else:
+    for i in range(1, len(chain)):
+        jump = chain[i] - chain[i - 1]
+        if jump in jumps:
             jumps[jump] += 1
+        else:
+            jumps[jump] = 1
     # add the implicit final jump
     if 3 in jumps:
         jumps[3] += 1
@@ -86,19 +87,25 @@ def count_joltage_differences(chain):
     return jumps
 
 
+def many_chains():
+    pass
+
+
+
 @timeit
 def part1():
     adapters = set(joltages)
-    chain = chain_up(adapters, start_jolts=0)
+    chain = [0]
+    chain_up(adapters, chain)
     jumps = count_joltage_differences(chain)
     print(jumps[1] * jumps[3])
-    # 2368
+    # # 2368
+    # print(chain)
 
 
 @timeit
 def part2():
-    pass
-
+    print(sorted(sample1))
 
 if __name__ == '__main__':
     part1()
